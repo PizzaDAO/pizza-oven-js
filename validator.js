@@ -1,4 +1,4 @@
-function ResizeImage() {
+function ResizeImage(ingredient_size) {
     var filesToUpload = document.getElementById('imageFile').files;
     var file = filesToUpload[0];
 
@@ -15,8 +15,8 @@ function ResizeImage() {
             var ctx = canvas.getContext("2d");
             ctx.drawImage(img, 0, 0);
 
-            var MAX_WIDTH = 512;
-            var MAX_HEIGHT = 512;
+            var MAX_WIDTH = ingredient_size;
+            var MAX_HEIGHT = ingredient_size;
             var width = img.width;
             var height = img.height;
 
