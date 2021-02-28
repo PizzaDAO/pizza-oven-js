@@ -1,5 +1,24 @@
 {
-  "scripts":{
+  "name": "ingredient-validator",
+  "version": "1.0.0",
+  "description": "You can use the [editor on GitHub](https://github.com/PizzaDAO/ingredient-validator/edit/main/README.md) to maintain and preview the content for your website in Markdown files.",
+  "main": "validator.js",
+  "dependencies": {
+    "typescript": "^4.2.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PizzaDAO/ingredient-validator.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/PizzaDAO/ingredient-validator/issues"
+  },
+  "homepage": "https://github.com/PizzaDAO/ingredient-validator#readme"
 }
