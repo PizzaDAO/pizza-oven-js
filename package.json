@@ -9,7 +9,8 @@
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^4.15.2",
     "@typescript-eslint/parser": "^4.15.2",
-    "eslint": "^7.21.0"
+    "eslint": "^7.21.0",
+    "prettier": "^2.2.1"
   },
   "scripts": {
     "test": "echo \"Error: no tests installed\" && exit 1",
