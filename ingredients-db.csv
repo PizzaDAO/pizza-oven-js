@@ -1,0 +1,11 @@
+unique,class,attribute,niceName,emissionCount,emissionDensity,particleScale,particleRand
+0,box,cardboard,Pizza Box,1,1,1,1
+1,crust,thin,Thin Crust,1,1,1,1
+1,crust,thick,Thick Crust,1,1,1,0.25
+2,paper,waxpaper,Wax Paper,1,1,1,0.25
+8,cheese,mozzarella,Mozzarella,1,1,1,0.25
+56,sauce,tomato,Tomato Sauce,1,1,1,0.25
+44,topping,pepperoni,Pepperoni,15,200,,0.25
+46,extra,nft,cryptopunk,1,1,1,0.25
+16,topping,olives,Sliced Olives,21,200,,0.25
+141,topping,pepperflakes,Hot Pepper Flakes,35,200,,0.25
