@@ -1,8 +1,6 @@
 import csv
 import json
-
-def mk_layers(start, end):
-  return {'layer '+str(start): None for start in range (start,end)}
+import random
 
 # space of all possible recipes? Unclear from meeting notes, unused for now
 recipe_index = []
@@ -32,37 +30,36 @@ types_to_layers = {
   'cheese': [4],
   'toppings': [5,6],
   'extras': [7]
-}
+}  
 
-""" class Base:
-  def __init__(self, ):
-  
-""" 
+def mk_layers(start, end):
+  return {'layer '+str(start): None for start in range (start,end)}
+
+
+def pour_bucket(dict, layer, buckets):
+  """Finds the right bucket for a layer based on dict mapping, removes a 
+  random item from bucket, assigns it to the layer, and returns layer"""
+  for bucket in buckets:
+    if int(layer[-1]) in dict[bucket]:
+      layer = random.choice(bucket)
+      return layer
+
+def pour_buckets(dict, layers, buckets):
+  for layer in layers:
+    pour_bucket(dict, layer, buckets)
+  return layers
+
 # A blank recipe template
 class Recipe:
-  def __init__(self, name, desc, temp, time, base, toppings, extras):
+  def __init__(self, buckets, name=None, desc=None, temp=None, time=None):
     self.recipeLongName = name
     self.description = desc
     self.ovenTemp = temp
     self.cookTime = time
-    self.base = base
-    self.toppings = toppings
-    self.extras = extras  
+    self.base = pour_buckets(types_to_layers, mk_layers(0,5), buckets)
+    self.toppings = pour_buckets(types_to_layers, mk_layers(5,7), buckets)
+    self.extras = pour_buckets(types_to_layers, mk_layers(7,8), buckets)
 
-
-""" recipe = {
-  'recipeLongName': '',
-  'description': '',
-  'ovenTemp': '',
-  'cookTime': '',
-  'base': mk_layers(0,5),
-  'toppings': mk_layers(5,7),
-  'extras': mk_layers(7,8)
-} """
-
-def mk_recipe(Recipe, buckets):
-  for layer in recipe['base']:
-    layer
 
 def mk_description(recipe):
   """takes a pizza recipe with defined layers and gives it a description"""
@@ -73,7 +70,6 @@ def allocate_to_bucket(ingredient, buckets):
       if int(ingredient['unique'][1]) in types_to_layers[bucket]:
         buckets[bucket].append(ingredient)
 
-# Horrible function I know, will turn it into something nice iteratively
 def fill_buckets(ingredients, buckets):
   """buckets each ingredient item according to middle digit of the 'unique' field"""
   for ingredient in ingredients:
