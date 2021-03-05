@@ -41,15 +41,15 @@ def pour_bucket(dict, layer, buckets):
   random item from bucket, assigns it to the layer, and returns layer"""
   for bucket in buckets:
     if int(layer[-1]) in dict[bucket]:
-      layer = random.choice(bucket)
-      return layer
+      choice = random.choice(buckets[bucket])
+      buckets[bucket].remove(choice)
+      return choice 
 
 def pour_buckets(dict, layers, buckets):
   for layer in layers:
-    pour_bucket(dict, layer, buckets)
+    layers[layer] = pour_bucket(dict, layer, buckets)
   return layers
 
-# A blank recipe template
 class Recipe:
   def __init__(self, buckets, name=None, desc=None, temp=None, time=None):
     self.recipeLongName = name

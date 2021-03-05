@@ -8,3 +8,21 @@ unique,class,attribute,niceName,emissionCount,emissionDensity,particleScale,part
 031,sauce,pesto,Pesto Sauce,1,1,1,0.25
 032,sauce,bbq,BBQ Sauce Base,15,200,,0.25
 040,cheese,mozzarella,Mozzarella,1,1,1,0.25
+000,box,cardboard,Pizza Box,1,1,1,1
+010,waxpaper,checker,Checker Wax Paper,,,,
+020,crust,thin,Thin Crust,1,1,1,1
+021,crust,thick,Thick Crust,1,1,1,0.25
+022,crust,moon,Moon Crust,1,1,1,0.25
+030,sauce,tomato,Tomato Sauce,1,1,1,0.25
+031,sauce,pesto,Pesto Sauce,1,1,1,0.25
+032,sauce,bbq,BBQ Sauce Base,15,200,,0.25
+040,cheese,mozzarella,Mozzarella,1,1,1,0.25
+000,box,cardboard,Pizza Box,1,1,1,1
+010,waxpaper,checker,Checker Wax Paper,,,,
+020,crust,thin,Thin Crust,1,1,1,1
+021,crust,thick,Thick Crust,1,1,1,0.25
+032,crust,moon,Moon Crust,1,1,1,0.25
+040,sauce,tomato,Tomato Sauce,1,1,1,0.25
+051,sauce,pesto,Pesto Sauce,1,1,1,0.25
+062,sauce,bbq,BBQ Sauce Base,15,200,,0.25
+070,cheese,mozzarella,Mozzarella,1,1,1,0.25
