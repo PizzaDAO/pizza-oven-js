@@ -10,24 +10,47 @@ recipe_index = []
 # abstract ingredient
 ingredient = {}
 
-# items from db for making a pizza recipe, thrown into buckets
-base = {
+""" Categories of ingredients NB have one to many relationship with layers
+Currently bucketing as simple solution to rarity will be multiple copies of
+a single ingredient to the bucket for a category of ingredients"""
+buckets = {
   'box': [],
   'waxpaper': [],
   'crust': [],
   'sauce': [],
-  'cheese': []
+  'cheese': [],
+  'toppings': [],
+  'extras': []
 }
-toppings = []
-extras = []
-buckets = {
-  'base': base,
-  'toppings': toppings,
-  'extras': extras
+
+# Mapping of which ingredient types match to which pizza layers - not one to one
+types_to_layers = {
+  'box': [0],
+  'waxpaper': [1],
+  'crust': [2],
+  'sauce': [3],
+  'cheese': [4],
+  'toppings': [5,6],
+  'extras': [7]
 }
+
+""" class Base:
+  def __init__(self, ):
   
+""" 
 # A blank recipe template
-recipe = {
+class Recipe:
+  def __init__(self, name, desc, temp, time, base, toppings, extras):
+    self.recipeLongName = name
+    self.description = desc
+    self.ovenTemp = temp
+    self.cookTime = time
+    self.base = base
+    self.toppings = toppings
+    self.extras = extras  
+
+
+""" recipe = {
   'recipeLongName': '',
   'description': '',
   'ovenTemp': '',
@@ -35,34 +58,26 @@ recipe = {
   'base': mk_layers(0,5),
   'toppings': mk_layers(5,7),
   'extras': mk_layers(7,8)
-}
+} """
 
-# Do I need a buckets to layers mapping later?
+def mk_recipe(Recipe, buckets):
+  for layer in recipe['base']:
+    layer
 
 def mk_description(recipe):
   """takes a pizza recipe with defined layers and gives it a description"""
   return recipe
 
+def allocate_to_bucket(ingredient, buckets):
+  for bucket in buckets:
+      if int(ingredient['unique'][1]) in types_to_layers[bucket]:
+        buckets[bucket].append(ingredient)
+
 # Horrible function I know, will turn it into something nice iteratively
 def fill_buckets(ingredients, buckets):
   """buckets each ingredient item according to middle digit of the 'unique' field"""
   for ingredient in ingredients:
-    if int(ingredient['unique'][1]) == 0:
-      buckets['base']['box'].append(ingredient)
-    elif int(ingredient['unique'][1]) == 1:
-      buckets['base']['waxpaper'].append(ingredient)
-    elif int(ingredient['unique'][1]) == 2:
-      buckets['base']['crust'].append(ingredient)
-    elif int(ingredient['unique'][1]) == 3:
-      buckets['base']['sauce'].append(ingredient)
-    elif int(ingredient['unique'][1]) == 4:
-      buckets['base']['cheese'].append(ingredient)
-    elif 4 < int(ingredient['unique'][1]) < 7:
-      buckets['toppings'].append(ingredient)
-    elif int(ingredient['unique'][1]) == 7:
-      buckets['extras'].append(ingredient)
-    else:
-      print ("invalid ingredient layer code") # replace later with something neater
+    allocate_to_bucket(ingredient, buckets)
 
 def main():
   with open('ingredients-db.csv', mode='r') as file:
