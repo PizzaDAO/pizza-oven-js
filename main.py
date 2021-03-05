@@ -76,9 +76,12 @@ def fill_buckets(ingredients, buckets):
     allocate_to_bucket(ingredient, buckets)
 
 def main():
-  with open('ingredients-db.csv', mode='r') as file:
-    ingredients = csv.DictReader(file)
+  with open('ingredients-db.csv', mode='r') as f:
+    ingredients = csv.DictReader(f)
     fill_buckets(ingredients, buckets)
+  recipe = Recipe(buckets)
+  with open('recipe.json', mode='w', encoding='utf-8') as f:
+    f.write(json.dumps(recipe.__dict__))
 
 if __name__ == "__main__":
   main()

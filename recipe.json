@@ -1,0 +1,92 @@
+{
+  "recipeLongName": null,
+  "description": null,
+  "ovenTemp": null,
+  "cookTime": null,
+  "base": {
+    "layer 0": {
+      "unique": "000",
+      "class": "box",
+      "attribute": "cardboard",
+      "niceName": "Pizza Box",
+      "emissionCount": "1",
+      "emissionDensity": "1",
+      "particleScale": "1",
+      "particleRand": "1"
+    },
+    "layer 1": {
+      "unique": "010",
+      "class": "waxpaper",
+      "attribute": "checker",
+      "niceName": "Checker Wax Paper",
+      "emissionCount": "",
+      "emissionDensity": "",
+      "particleScale": "",
+      "particleRand": ""
+    },
+    "layer 2": {
+      "unique": "022",
+      "class": "crust",
+      "attribute": "moon",
+      "niceName": "Moon Crust",
+      "emissionCount": "1",
+      "emissionDensity": "1",
+      "particleScale": "1",
+      "particleRand": "0.25"
+    },
+    "layer 3": {
+      "unique": "030",
+      "class": "sauce",
+      "attribute": "tomato",
+      "niceName": "Tomato Sauce",
+      "emissionCount": "1",
+      "emissionDensity": "1",
+      "particleScale": "1",
+      "particleRand": "0.25"
+    },
+    "layer 4": {
+      "unique": "040",
+      "class": "cheese",
+      "attribute": "mozzarella",
+      "niceName": "Mozzarella",
+      "emissionCount": "1",
+      "emissionDensity": "1",
+      "particleScale": "1",
+      "particleRand": "0.25"
+    }
+  },
+  "toppings": {
+    "layer 5": {
+      "unique": "051",
+      "class": "sauce",
+      "attribute": "pesto",
+      "niceName": "Pesto Sauce",
+      "emissionCount": "1",
+      "emissionDensity": "1",
+      "particleScale": "1",
+      "particleRand": "0.25"
+    },
+    "layer 6": {
+      "unique": "062",
+      "class": "sauce",
+      "attribute": "bbq",
+      "niceName": "BBQ Sauce Base",
+      "emissionCount": "15",
+      "emissionDensity": "200",
+      "particleScale": "",
+      "particleRand": "0.25"
+    }
+  },
+  "extras": {
+    "layer 7": {
+      "unique": "070",
+      "class": "cheese",
+      "attribute": "mozzarella",
+      "niceName": "Mozzarella",
+      "emissionCount": "1",
+      "emissionDensity": "1",
+      "particleScale": "1",
+      "particleRand": "0.25"
+    }
+  }
+}
