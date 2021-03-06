@@ -1,29 +1,21 @@
 {
-  "name": "ingredient-validator",
+  "name": "pizza-oven-js",
   "version": "1.0.0",
-  "description": "You can use the [editor on GitHub](https://github.com/PizzaDAO/ingredient-validator/edit/main/README.md) to maintain and preview the content for your website in Markdown files.",
-  "main": "validator.js",
-  "dependencies": {},
-  "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^4.15.2",
-    "@typescript-eslint/parser": "^4.15.2",
-    "eslint": "^7.21.0",
-    "prettier": "^2.2.1",
-    "typescript": "^4.2.2"
-  },
+  "description": "Rare Pizzas - Pizza Oven is used to provide metadata for pizza assets and generate pizza recipes",
+  "main": "src/index.js",
+  "license": "SEE LICENSE IN LICENSE",
   "scripts": {
     "test": "echo \"Error: no tests installed\" && exit 1",
     "build": "tsc",
     "start": "node server.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/PizzaDAO/ingredient-validator.git"
-  },
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/PizzaDAO/ingredient-validator/issues"
-  },
-  "homepage": "https://github.com/PizzaDAO/ingredient-validator#readme"
+  "dependencies": {},
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^4.16.1",
+    "@typescript-eslint/parser": "^4.16.1",
+    "eslint": "^7.21.0",
+    "eslint-config-prettier": "^8.1.0",
+    "prettier": "^2.2.1",
+    "typescript": "^4.2.3"
+  }
 }

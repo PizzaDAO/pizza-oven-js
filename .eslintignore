@@ -1,0 +1,10 @@
+# Folders
+dist
+
+# IDEs
+.idea
+.vscode
+
+# Jest
+jest.config.js
+jest.setup.js
