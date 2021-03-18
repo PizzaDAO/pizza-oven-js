@@ -62,228 +62,285 @@ function randomPointOnDisk(rand, centerX, centerY, radius)
 // Scatters
 /////////////////////////////////////////////////////////////////
 
-// Scatter methods table
-// could make a ScatterFactory, and each scatter a derived Scatter class, then
-// keep track if it all that way. Better design. TODO for later.
-var scatterTable = {
-    "Random": randomScatter,
-    "Spiral": spiralScatter,   
-    "Smiley": smileyScatter,
-    "Spokes": spokesScatter,    
-    "Concentric Circles": concentricCirclesScatter  
-};
+// Scatter objects
+class Scatter {
+    constructor(name) {
+        this.name = name;
+        // add to scattertable
+        Scatter.table[this.name] = this;
+    } 
 
-function randomScatter(rand, count, renderObjList, KitchenData) {
-    var ret = [];
-    for (var i = 0; i < count; i++)
-    {
-        // subtract scale radius from the crust radius so the topping will fit inside (somewhat, it could still be rotate further out, but okay)
-        ret.push(randomPointOnDisk(rand, 0.0, 0.0, KitchenData.Rules.RADIUS_OF_TOPPINGS_WITHIN_CRUST - renderObjList[i].scale / 2.0));
+    // pure virtual
+    scatter(rand, count, renderObjList, KitchenData) {
     }
-    return ret;
-}
 
-function spiralScatter(rand, count, renderObjList, KitchenData) {
-    // 
-    // r=a + b * angle
-    // 
-    // choose a rate that angle moves and rate that radius increases
-    // TODO: these should be part of scatter method data??
-    var angleVel = randomRangeFloat(rand, -3.0, 3.0) * PI / count;
-    var maxRadius = KitchenData.Rules.RADIUS_OF_TOPPINGS_WITHIN_CRUST - renderObjList[0].scale / 2.0;       // max radius will be outer edge of crust minus scale of first element. not exactly correct, but close enough. we will adjust the actual instance in further if necessary.
-    var rVel = randomRangeFloat(rand, 1, 2) * maxRadius / count
-    var currAngle = randomRangeFloat(rand, 0, TWO_PI);
-    var currR = 0;
-    var ret = [];
-    for (var i = 0; i < count; i++)
-    {
-        currR = Math.min(currR, KitchenData.Rules.RADIUS_OF_TOPPINGS_WITHIN_CRUST - renderObjList[i].scale / 2.0);
-
-        // rotate currR thru currAngle. that is position
-        var x = currR * Math.cos(currAngle);
-        var y = currR * Math.sin(currAngle);
-
-        // accum
-        currAngle += angleVel;
-        currR += rVel;
-
-        ret.push([x,y]);
+    getMinInstanceCount() {
+        return this.minInstanceCount;
     }
-    return ret;
-}
-
-
-
-function smileyScatter(rand, count, renderObjList, KitchenData) {
-    var ret = [];
+    getMaxInstanceCount() {
+        return this.maxInstanceCount;
+    }    
     
-    var used = 0;
-
-    // place left eye
-    if (used < count)
-    {
-        var len = (KitchenData.Rules.RADIUS_OF_TOPPINGS_WITHIN_CRUST - renderObjList[used].scale / 2.0) / 1.5;
-        var angle = -3 * PI / 4;
-
-        var x = len * Math.cos(angle);
-        var y = len * Math.sin(angle);
-
-        ret.push([x,y]);
-        used++;
-    }
-
-    // place right eye
-    if (used < count)
-    {
-        var len = (KitchenData.Rules.RADIUS_OF_TOPPINGS_WITHIN_CRUST - renderObjList[used].scale / 2.0) / 1.5;
-        var angle = -PI / 4;
-
-        var x = len * Math.cos(angle);
-        var y = len * Math.sin(angle);
-
-        ret.push([x,y]);
-        used++;
-    }
-
-    // place smile
-    var startX = -.25;
-
-    var numSteps = count - used;
-    for (var i = 0; i < numSteps; i++)
-    {
-        var x = startX + i * (0.5 / numSteps);
-        var y = 0.25;
-        ret.push([x,y]);
-    }
-
-    return ret;
+    // static table of all created scatter objects
+    static table = {};
+    
 }
 
-function spokesScatter(rand, count, renderObjList, KitchenData) {
-    var ret = [];
-
-    // calculate number of spokes
-    // calculate number of points per spoke
-    const MIN_POINTS_PER_SPOKE = 2;
-    const MAX_POINTS_PER_SPOKE = 6;
-    var maxPerSpoke = randomRange(rand, MIN_POINTS_PER_SPOKE, MAX_POINTS_PER_SPOKE);
-    var numSpokes = 2;
-    var numPointsPerSpoke = Math.floor(count / numSpokes);
-    while (numPointsPerSpoke > maxPerSpoke)
-    {
-        numSpokes++;
-        numPointsPerSpoke = Math.floor(count / numSpokes);
+class RandomScatter extends Scatter {
+    constructor(name, minInstanceCount = -1, maxInstanceCount = -1) {
+        super(name);
+        this.minInstanceCount = minInstanceCount;
+        this.maxInstanceCount = maxInstanceCount; 
     }
 
-    // now calculate the excess (how many more we have than we will scatter on the spokes)
-    var extra = count - (numSpokes * numPointsPerSpoke);
-
-
-    var iCount = 0;
-    // HACK: for now put extras in the middle, but later may want to randomize it
-    for  (var iExtra = 0; iExtra < extra; iExtra++)
-    {
-        ret.push([0,0]);
-        iCount++;
-    }
-
-    // if count > 0
-    if (numSpokes * numPointsPerSpoke > extra)
-    { 
-        // for each point on a spoke
-        var maxRadius = KitchenData.Rules.RADIUS_OF_TOPPINGS_WITHIN_CRUST - renderObjList[0].scale / 2.0;       // max radius will be outer edge of crust minus scale of first element. not exactly correct, but close enough. we will adjust the actual instance in further if necessary.
-  
-        var rInc = maxRadius / numPointsPerSpoke;
-        var angInc = TWO_PI / numSpokes;
-        var angStart = randomRange(rand, 0, PI);
-        for (var iPoint = 0; iPoint < numPointsPerSpoke; iPoint++)
+    scatter(rand, count, renderObjList, KitchenData) {
+        var ret = [];
+        for (var i = 0; i < count; i++)
         {
-            var len = (iPoint + 1) * rInc;
+            // subtract scale radius from the crust radius so the topping will fit inside (somewhat, it could still be rotate further out, but okay)
+            ret.push(randomPointOnDisk(rand, 0.0, 0.0, KitchenData.Rules.RADIUS_OF_TOPPINGS_WITHIN_CRUST - renderObjList[i].scale / 2.0));
+        }
+        return ret;
+    }
+}
 
-            // adjust len so obj fits inside the play area
-            len = Math.min(len, KitchenData.Rules.RADIUS_OF_TOPPINGS_WITHIN_CRUST - renderObjList[iCount].scale / 2.0);
+class SpiralScatter extends Scatter {
+    constructor(name, minInstanceCount = -1, maxInstanceCount = -1) {
+        super(name);
+        this.minInstanceCount = minInstanceCount;
+        this.maxInstanceCount = maxInstanceCount; 
+    }
 
-            // for each spoke
-            for (var iSpoke = 0; iSpoke < numSpokes; iSpoke++)
+    scatter(rand, count, renderObjList, KitchenData) {
+        // 
+        // r=a + b * angle
+        // 
+        // choose a rate that angle moves and rate that radius increases
+        // TODO: these should be part of scatter method data??
+        var angleVel = randomRangeFloat(rand, -3.0, 3.0) * PI / count;
+        var maxRadius = KitchenData.Rules.RADIUS_OF_TOPPINGS_WITHIN_CRUST - renderObjList[0].scale / 2.0;       // max radius will be outer edge of crust minus scale of first element. not exactly correct, but close enough. we will adjust the actual instance in further if necessary.
+        var rVel = randomRangeFloat(rand, 1, 2) * maxRadius / count
+        var currAngle = randomRangeFloat(rand, 0, TWO_PI);
+        var currR = 0;
+        var ret = [];
+        for (var i = 0; i < count; i++)
+        {
+            currR = Math.min(currR, KitchenData.Rules.RADIUS_OF_TOPPINGS_WITHIN_CRUST - renderObjList[i].scale / 2.0);
+
+            // rotate currR thru currAngle. that is position
+            var x = currR * Math.cos(currAngle);
+            var y = currR * Math.sin(currAngle);
+
+            // accum
+            currAngle += angleVel;
+            currR += rVel;
+
+            ret.push([x,y]);
+        }
+        return ret;
+    }
+}
+
+class FaceScatter extends Scatter {
+    constructor(name, minInstanceCount = -1, maxInstanceCount = -1) {
+        super(name);
+        this.minInstanceCount = minInstanceCount;
+        this.maxInstanceCount = maxInstanceCount; 
+    }
+
+    scatter(rand, count, renderObjList, KitchenData) {
+        var ret = [];
+    
+        var used = 0;
+    
+        // place left eye
+        if (used < count)
+        {
+            var len = (KitchenData.Rules.RADIUS_OF_TOPPINGS_WITHIN_CRUST - renderObjList[used].scale / 2.0) / 1.5;
+            var angle = -3 * PI / 4;
+    
+            var x = len * Math.cos(angle);
+            var y = len * Math.sin(angle);
+    
+            ret.push([x,y]);
+            used++;
+        }
+    
+        // place right eye
+        if (used < count)
+        {
+            var len = (KitchenData.Rules.RADIUS_OF_TOPPINGS_WITHIN_CRUST - renderObjList[used].scale / 2.0) / 1.5;
+            var angle = -PI / 4;
+    
+            var x = len * Math.cos(angle);
+            var y = len * Math.sin(angle);
+    
+            ret.push([x,y]);
+            used++;
+        }
+    
+        // place mouth - line for now
+        var startX = -.25;
+    
+        var numSteps = count - used;
+        for (var i = 0; i < numSteps; i++)
+        {
+            var x = startX + i * (0.5 / numSteps);
+            var y = 0.25;
+            ret.push([x,y]);
+        }
+    
+        return ret;
+    }
+}
+
+class SpokesScatter extends Scatter {
+    constructor(name, minInstanceCount = -1, maxInstanceCount = -1) {
+        super(name);
+        this.minInstanceCount = minInstanceCount;
+        this.maxInstanceCount = maxInstanceCount; 
+    }
+
+    scatter(rand, count, renderObjList, KitchenData) {
+        var ret = [];
+
+        // calculate number of spokes
+        // calculate number of points per spoke
+        const MIN_POINTS_PER_SPOKE = 2;
+        const MAX_POINTS_PER_SPOKE = 6;
+        var maxPerSpoke = randomRange(rand, MIN_POINTS_PER_SPOKE, MAX_POINTS_PER_SPOKE);
+        var numSpokes = 2;
+        var numPointsPerSpoke = Math.floor(count / numSpokes);
+        while (numPointsPerSpoke > maxPerSpoke)
+        {
+            numSpokes++;
+            numPointsPerSpoke = Math.floor(count / numSpokes);
+        }
+    
+        // now calculate the excess (how many more we have than we will scatter on the spokes)
+        var extra = count - (numSpokes * numPointsPerSpoke);
+    
+    
+        var iCount = 0;
+        // HACK: for now put extras in the middle, but later may want to randomize it
+        for  (var iExtra = 0; iExtra < extra; iExtra++)
+        {
+            ret.push([0,0]);
+            iCount++;
+        }
+    
+        // if count > 0
+        if (numSpokes * numPointsPerSpoke > extra)
+        { 
+            // for each point on a spoke
+            var maxRadius = KitchenData.Rules.RADIUS_OF_TOPPINGS_WITHIN_CRUST - renderObjList[0].scale / 2.0;       // max radius will be outer edge of crust minus scale of first element. not exactly correct, but close enough. we will adjust the actual instance in further if necessary.
+      
+            var rInc = maxRadius / numPointsPerSpoke;
+            var angInc = TWO_PI / numSpokes;
+            var angStart = randomRange(rand, 0, PI);
+            for (var iPoint = 0; iPoint < numPointsPerSpoke; iPoint++)
             {
-                // choose angle
-               var angle = angStart + iSpoke * angInc;
-
-                // calculate point
-                var x = len * Math.cos(angle);
-                var y = len * Math.sin(angle);
-                ret.push([x,y]);
-                iCount++;         
-            }
-        }   
-
+                var len = (iPoint + 1) * rInc;
+    
+                // adjust len so obj fits inside the play area
+                len = Math.min(len, KitchenData.Rules.RADIUS_OF_TOPPINGS_WITHIN_CRUST - renderObjList[iCount].scale / 2.0);
+    
+                // for each spoke
+                for (var iSpoke = 0; iSpoke < numSpokes; iSpoke++)
+                {
+                    // choose angle
+                   var angle = angStart + iSpoke * angInc;
+    
+                    // calculate point
+                    var x = len * Math.cos(angle);
+                    var y = len * Math.sin(angle);
+                    ret.push([x,y]);
+                    iCount++;         
+                }
+            }   
+    
+        }
+        return ret;
     }
-    return ret;
-
 }
 
-function concentricCirclesScatter(rand, count, renderObjList, KitchenData) {
-    var ret = [];
-
-    // calculate number of circles
-    // calculate number of points per circle
-    const MIN_POINTS_PER_CIRCLE = 3;
-    const MAX_POINTS_PER_CIRCLE = 6;
-    var maxPerCircle = randomRange(rand, MIN_POINTS_PER_CIRCLE, MAX_POINTS_PER_CIRCLE);
-    var numCircles = 2;
-    var numPointsPerCircle = Math.floor(count / numCircles);
-    while (numPointsPerCircle > maxPerCircle)
-    {
-        numCircles++;
-        numPointsPerCircle = Math.floor(count / numCircles);
+class ConcentricCirclesScatter extends Scatter {
+    constructor(name, minInstanceCount = -1, maxInstanceCount = -1) {
+        super(name);
+        this.minInstanceCount = minInstanceCount;
+        this.maxInstanceCount = maxInstanceCount; 
     }
 
-    // now calculate the excess (how many more we have than we will scatter on the circles)
-    var extra = count - (numCircles * numPointsPerCircle);
-
-
-    var iCount = 0;
-    // HACK: for now put extras in the middle, but later may want to randomize it
-    for  (var iExtra = 0; iExtra < extra; iExtra++)
-    {
-        ret.push([0,0]);
-        iCount++;
-    }
-
-    // if count > 0
-    if (numCircles * numPointsPerCircle > extra)
-    { 
-        // for each circle
-        var maxRadius = KitchenData.Rules.RADIUS_OF_TOPPINGS_WITHIN_CRUST - renderObjList[0].scale / 2.0;       // max radius will be outer edge of crust minus scale of first element. not exactly correct, but close enough. we will adjust the actual instance in further if necessary.
-
-        var rInc = maxRadius / numCircles;
-        var angInc = TWO_PI / numPointsPerCircle;
-        var angStart = randomRange(rand, 0, PI);
-        for (var iCircle = 0; iCircle < numCircles; iCircle++)
+    scatter(rand, count, renderObjList, KitchenData) {
+        var ret = [];
+    
+        // calculate number of circles
+        // calculate number of points per circle
+        const MIN_POINTS_PER_CIRCLE = 3;
+        const MAX_POINTS_PER_CIRCLE = 6;
+        var maxPerCircle = randomRange(rand, MIN_POINTS_PER_CIRCLE, MAX_POINTS_PER_CIRCLE);
+        var numCircles = 2;
+        var numPointsPerCircle = Math.floor(count / numCircles);
+        while (numPointsPerCircle > maxPerCircle)
         {
-            var len = (iCircle + 1) * rInc;
-            angStart += iCircle * angInc / numCircles;  // stagger the concentric circles a little, otherwise would look like spokess
-            // adjust len so obj fits inside the play area
-            len = Math.min(len, KitchenData.Rules.RADIUS_OF_TOPPINGS_WITHIN_CRUST - renderObjList[iCount].scale / 2.0);
+            numCircles++;
+            numPointsPerCircle = Math.floor(count / numCircles);
+        }
+    
+        // now calculate the excess (how many more we have than we will scatter on the circles)
+        var extra = count - (numCircles * numPointsPerCircle);
         
-            // for each point on a circle
-            for (var iPoint = 0; iPoint < numPointsPerCircle; iPoint++)
+        var iCount = 0;
+        // HACK: for now put extras in the middle, but later may want to randomize it
+        for  (var iExtra = 0; iExtra < extra; iExtra++)
+        {
+            ret.push([0,0]);
+            iCount++;
+        }
+    
+        // if count > 0
+        if (numCircles * numPointsPerCircle > extra)
+        { 
+            // for each circle
+            var maxRadius = KitchenData.Rules.RADIUS_OF_TOPPINGS_WITHIN_CRUST - renderObjList[0].scale / 2.0;       // max radius will be outer edge of crust minus scale of first element. not exactly correct, but close enough. we will adjust the actual instance in further if necessary.
+    
+            var rInc = maxRadius / numCircles;
+            var angInc = TWO_PI / numPointsPerCircle;
+            var angStart = randomRange(rand, 0, PI);
+            for (var iCircle = 0; iCircle < numCircles; iCircle++)
             {
-                // choose angle
-               var angle = angStart + iPoint * angInc;
-
-                // calculate point
-                var x = len * Math.cos(angle);
-                var y = len * Math.sin(angle);
-                ret.push([x,y]);
-                iCount++;         
-            }
-        }   
-
-    }
-    return ret;
-
+                var len = (iCircle + 1) * rInc;
+                angStart += iCircle * angInc / numCircles;  // stagger the concentric circles a little, otherwise would look like spokess
+                // adjust len so obj fits inside the play area
+                len = Math.min(len, KitchenData.Rules.RADIUS_OF_TOPPINGS_WITHIN_CRUST - renderObjList[iCount].scale / 2.0);
+            
+                // for each point on a circle
+                for (var iPoint = 0; iPoint < numPointsPerCircle; iPoint++)
+                {
+                    // choose angle
+                    var angle = angStart + iPoint * angInc;
+    
+                    // calculate point
+                    var x = len * Math.cos(angle);
+                    var y = len * Math.sin(angle);
+                    ret.push([x,y]);
+                    iCount++;         
+                }
+            }   
+        }
+        return ret;    
+    }        
 }
+
+/////////////////////////
+// create some scatters
+/////////////////////////
+new RandomScatter("Random");
+new SpiralScatter("Spiral");
+new FaceScatter("Face");
+new SpokesScatter("Spokes");
+new ConcentricCirclesScatter("Concentric Circles");
+
 
 //////////////////////////////////////////////////
 // Display List
@@ -346,17 +403,17 @@ function generateDisplayList(pizza, KitchenData) {
         // scatter
         // TODO: move this to the make function
         var scatterIndex = KITCHEN_chooseItem(KitchenData.ScatterMethods, randomRangeFloat(pizza.rand, 0.0, 1.0));
-        var scatter = scatterTable[KitchenData.ScatterMethods[scatterIndex].name];
+        var scatter = Scatter.table[KitchenData.ScatterMethods[scatterIndex].name];
 
         var toppingRenderObjs = [];
         for (var iCount = 0; iCount < toppingCount; iCount++)
         {
-            renderObj = createAndAppendRenderObjFromVariant(pizza.rand, topping, displayBundle, textureToIndexMap, scatter);  
+            renderObj = createAndAppendRenderObjFromVariant(pizza.rand, topping, displayBundle, textureToIndexMap);  
             toppingRenderObjs.push(renderObj); 
         }
 
         // now call scatter to get positions, then append them
-        var positions = scatter(pizza.rand, toppingCount, toppingRenderObjs, KitchenData);
+        var positions = scatter.scatter(pizza.rand, toppingCount, toppingRenderObjs, KitchenData);
         // TODO: assert positions.length == toppingCount
         for (var iCount = 0; iCount < toppingCount; iCount++)
         {
@@ -980,10 +1037,5 @@ Pizza.prototype.generatePizzaDescription = function(ingredientsData) {
 ///////////////////////////////////////////////////
 exports.Pizza = Pizza
 exports.generateDisplayList = generateDisplayList
-exports.randomScatter = randomScatter
-exports.mulberry32 = mulberry32
-exports.randomRange = randomRange
-exports.randomRangeFloat = randomRangeFloat
-exports.randomPointOnDisk = randomPointOnDisk
 
 

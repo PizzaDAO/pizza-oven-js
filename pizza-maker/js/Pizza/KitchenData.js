@@ -16,7 +16,7 @@ var KitchenData = {
     ScatterMethods: [
         {name: "Random", rarityLevel: 1},
         {name: "Spiral", rarityLevel: 2},
-        {name: "Smiley", rarityLevel: 3},  
+        {name: "Face", rarityLevel: 3},  
         {name: "Spokes", rarityLevel: 2},     
         {name: "Concentric Circles", rarityLevel: 2},                
     ],
